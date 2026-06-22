@@ -1,23 +1,24 @@
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
-const API = process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
-
 export async function POST(req: NextRequest) {
   const body = await req.json();
 
-  const res = await fetch(`${API}/v1/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-    cache: 'no-store',
-  });
-
-  const data = await res.json().catch(() => ({}));
-
-  if (!res.ok) {
-    return NextResponse.json(data, { status: res.status });
-  }
+  // MOCK LOGIN: El backend de Java ya no existe y nuestra nueva DB usa Email en vez de DNI.
+  // Para que puedas testear el frontend, aceptamos cualquier DNI/Password y mockeamos la respuesta.
+  
+  const data = {
+    token: 'jwt-falso-para-testear-nextjs',
+    usuario: {
+      dni: Number(body.dni) || 12345678,
+      nombre: 'Usuario de Prueba',
+      rol: 'ADMIN',
+      plantaId: null,
+      buqueNroIMO: null,
+      operacionId: null,
+      creadoEn: new Date().toISOString()
+    }
+  };
 
   // Setear las cookies que el resto del front espera
   const cookieStore = await cookies();
