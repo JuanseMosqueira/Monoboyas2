@@ -9,7 +9,7 @@ export default async function BuquePage() {
 
   const operacion = await fetchOperacionAsignada(usuario.dni);
 
-  if (!operacion || !['ACTIVA', 'PAUSADA'].includes(operacion.estado)) {
+  if (!operacion || !['ENCURSO', 'DETENIDA'].includes(operacion.estado)) {
     return (
       <section className="p-8 max-w-lg">
         <h1 className="text-lg font-bold">Hola, {usuario.nombre}</h1>
@@ -24,7 +24,7 @@ export default async function BuquePage() {
   return (
     <BuqueDashboard
       operacionId={operacion.id}
-      estadoInicial={operacion.estado as 'ACTIVA' | 'PAUSADA'}
+      estadoInicial={operacion.estado as 'ENCURSO' | 'DETENIDA'}
       operadorBuqueDni={usuario.dni}
       nombre={usuario.nombre}
     />

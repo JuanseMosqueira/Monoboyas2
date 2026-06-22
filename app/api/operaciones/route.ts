@@ -38,11 +38,11 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    if (!body.buqueNroIMO || !body.plantaId) {
-      return NextResponse.json({ error: "Faltan datos requeridos (buqueNroIMO, plantaId)" }, { status: 400 });
+    if (!body.buqueNroIMO || !body.plantaId || !body.tipo) {
+      return NextResponse.json({ error: "Faltan datos requeridos (buqueNroIMO, plantaId, tipo)" }, { status: 400 });
     }
 
-    const newOpId = await operacionService.planificarOperacion(body.buqueNroIMO, body.plantaId);
+    const newOpId = await operacionService.planificarOperacion(body.buqueNroIMO, body.plantaId, body.tipo);
     
     return NextResponse.json({ success: true, id: newOpId, estado: "PLANIFICADA" }, { status: 201 });
   } catch (error: any) {

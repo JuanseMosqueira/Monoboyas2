@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { PauseIcon, PlayIcon } from '@heroicons/react/24/solid';
 import TelemetriaEnVivo from '@/app/ui/dashboard/TelemetriaEnVivo';
 
-type Estado = 'ACTIVA' | 'PAUSADA';
+type Estado = 'ENCURSO' | 'DETENIDA';
 
 export default function BuqueDashboard({
   operacionId, estadoInicial, operadorBuqueDni, nombre,
@@ -29,7 +29,7 @@ export default function BuqueDashboard({
         setError(body?.error?.message ?? `No se pudo ${accion} la operación (HTTP ${res.status}).`);
         return;
       }
-      setEstado(accion === 'detener' ? 'PAUSADA' : 'ACTIVA');
+      setEstado(accion === 'detener' ? 'DETENIDA' : 'ENCURSO');
     } catch {
       setError('Error de red. Reintentá en unos segundos.');
     } finally {
@@ -37,7 +37,7 @@ export default function BuqueDashboard({
     }
   };
 
-  const activa = estado === 'ACTIVA';
+  const activa = estado === 'ENCURSO';
 
   return (
     <>

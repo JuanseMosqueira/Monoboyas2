@@ -31,7 +31,7 @@ export class OperacionService {
    * Planifica una operación asignando un buque y una planta.
    * La operación se crea en estado PLANIFICADA en la base de datos.
    */
-  async planificarOperacion(buqueNroIMO: number, plantaId: number): Promise<number> {
+  async planificarOperacion(buqueNroIMO: number, plantaId: number, tipo: string): Promise<number> {
     // 1. Validar que exista el buque y la planta en la BD
     const buqueRow = await prisma.buque.findUnique({ where: { nroIMO: buqueNroIMO } });
     if (!buqueRow) throw new Error("Buque no encontrado");
@@ -43,6 +43,7 @@ export class OperacionService {
     const opId = await this.operacionRepo.crear({
       buqueNroIMO,
       plantaId,
+      tipo,
       estado: "PLANIFICADA",
     });
 

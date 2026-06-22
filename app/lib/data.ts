@@ -90,8 +90,8 @@ export async function fetchMedicionesDeOperacion(
 }
 
 export async function fetchAlertasDeOperacion(operacionId: number): Promise<Alerta[]> {
-  const { data } = await fetchAlertas({ operacionId });
-  return data;
+  const res = await fetchAlertas({ operacionId }) as any;
+  return Array.isArray(res) ? res : res?.data ?? [];
 }
 
 export async function fetchOpcionesPlanificacion(): Promise<{

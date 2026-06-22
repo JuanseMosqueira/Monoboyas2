@@ -4,11 +4,15 @@ import * as path from "path";
 
 export class FileDataProvider implements ISensorDataProvider {
   private values: number[] = [];
-  private index: number = 0;
   private tipo: string;
+  private static indices: Record<string, number> = {};
 
   constructor(tipoSensor: string) {
     this.tipo = tipoSensor;
+    
+    if (FileDataProvider.indices[this.tipo] === undefined) {
+      FileDataProvider.indices[this.tipo] = 0;
+    }
     
     const fileMap: Record<string, string> = {
       PRESION: "presion.txt",
@@ -42,8 +46,9 @@ export class FileDataProvider implements ISensorDataProvider {
   }
 
   async obtenerDato(): Promise<number> {
-    const value = this.values[this.index];
-    this.index = (this.index + 1) % this.values.length; // Lectura cíclica
+    const idx = FileDataProvider.indices[this.tipo];
+    const value = this.values[idx];
+    FileDataProvider.indices[this.tipo] = (idx + 1) % this.values.length; // Lectura cíclica
     return value;
   }
 }

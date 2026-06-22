@@ -19,7 +19,7 @@ export default async function LanchaPage() {
     return <ConfirmarInicio operacion={operacion} operadorLanchaDni={usuario.dni} nombreUsuario={usuario.nombre} />;
   }
 
-  if (operacion.estado === 'ACTIVA' || operacion.estado === 'PAUSADA') {
+  if (operacion.estado === 'ENCURSO' || operacion.estado === 'DETENIDA') {
     const [alertas, sensores] = await Promise.all([
       fetchAlertasDeOperacion(operacion.id),
       fetchSensores({ monoboyaId: operacion.monoboyaId ?? undefined, activo: true }),
