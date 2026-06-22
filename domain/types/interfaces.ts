@@ -5,7 +5,7 @@ import type { Alerta } from "../entities/Alerta";
 
 /** Proveedor de datos para un sensor concreto (archivo, API externa, mock). */
 export interface ISensorDataProvider {
-  obtenerDato(): number;
+  obtenerDato(): Promise<number>;
 }
 
 // ─── Pub/Sub (emulación in-memory de MQTT) ──────────────────────────

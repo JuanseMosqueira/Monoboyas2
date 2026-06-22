@@ -10,8 +10,20 @@
 import { construirSensor, type Sensor } from "@/domain/entities/Sensor";
 import { prisma }                        from "@/persistence/lib/prisma";
 import type { TipoSensor }               from "@/domain/types/enums";
+import { MockDataProvider }              from "@/infrastructure/providers/MockDataProvider";
+import { ApiDataProvider }               from "@/infrastructure/providers/ApiDataProvider";
+import { FileDataProvider }              from "@/infrastructure/providers/FileDataProvider";
 
 export class SensorRepository {
+  private getProviderFor(tipo: string) {
+    if (["VIENTO", "OLEAJE", "CORRIENTE"].includes(tipo)) {
+      return new ApiDataProvider(tipo);
+    } else if (["PRESION", "AMARRE", "TENSION", "CAUDAL", "ORIENTACION"].includes(tipo)) {
+      return new FileDataProvider(tipo);
+    }
+    return new MockDataProvider(tipo);
+  }
+
   /**
    * Devuelve todos los sensores que pertenecen a una monoboya dada,
    * ya como instancias concretas de la jerarquía Sensor del dominio.
@@ -24,7 +36,7 @@ export class SensorRepository {
     });
 
     return rows.map((row) =>
-      construirSensor(row.id, row.tipo as TipoSensor, row.unidad),
+      construirSensor(row.id, row.tipo as TipoSensor, this.getProviderFor(row.tipo)),
     );
   }
 
@@ -40,7 +52,7 @@ export class SensorRepository {
     });
 
     return rows.map((row) =>
-      construirSensor(row.id, row.tipo as TipoSensor, row.unidad),
+      construirSensor(row.id, row.tipo as TipoSensor, this.getProviderFor(row.tipo)),
     );
   }
 
@@ -55,7 +67,7 @@ export class SensorRepository {
     });
 
     return rows.map((row) =>
-      construirSensor(row.id, row.tipo as TipoSensor, row.unidad),
+      construirSensor(row.id, row.tipo as TipoSensor, this.getProviderFor(row.tipo)),
     );
   }
 }

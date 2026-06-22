@@ -226,8 +226,12 @@ export default function TelemetriaEnVivo({ operacionId }: { operacionId: number 
         const mediciones = await r.json();
         if (!Array.isArray(mediciones) || mediciones.length === 0) return;
 
-        const porSensor: Record<number, any[]> = {};
-        mediciones.forEach((m) => { (porSensor[m.sensorId] ??= []).push(m); });
+        const porSensor: Record<string, any[]> = {};
+        mediciones.forEach((m) => { 
+          if (m.tipo) {
+            (porSensor[m.tipo] ??= []).push(m); 
+          }
+        });
         Object.values(porSensor).forEach((arr) =>
           arr.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
         );
@@ -235,7 +239,7 @@ export default function TelemetriaEnVivo({ operacionId }: { operacionId: number 
         // Número grande de cada tarjeta = última medición del sensor
         setSensores((prev) =>
           prev.map((s) => {
-            const hist = porSensor[s.dbId];
+            const hist = porSensor[s.tipoSensor];
             if (hist?.length) return { ...s, valor: hist[hist.length - 1].valor };
             return s;
           })
@@ -245,7 +249,7 @@ export default function TelemetriaEnVivo({ operacionId }: { operacionId: number 
         setSeries((prev) => {
           const ns = { ...prev };
           SENSORES_INIT.forEach((s) => {
-            const hist = porSensor[s.dbId];
+            const hist = porSensor[s.tipoSensor];
             if (hist?.length) {
               const puntos = hist.slice(-HIST_LEN).map((m: any) => ({
                 label: new Date(m.timestamp).toLocaleTimeString('es-AR', { hour12: false }),

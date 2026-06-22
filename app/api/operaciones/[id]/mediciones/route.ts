@@ -1,16 +1,19 @@
-import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
-
-const API = process.env.API_URL ?? 'http://localhost:8080';
+import { prisma } from '@/persistence/lib/prisma';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const token = (await cookies()).get('auth_token')?.value;
-
-  const res = await fetch(`${API}/v1/operaciones/${id}/mediciones`, {
-    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-    cache: 'no-store',
-  });
-  const data = await res.json().catch(() => []);
-  return NextResponse.json(data, { status: res.status });
+  try {
+    const { id } = await params;
+    
+    // Obtenemos las últimas mediciones de la operación
+    const mediciones = await prisma.medicion.findMany({
+      where: { operacionId: Number(id) },
+      orderBy: { timestamp: 'desc' },
+      take: 600 // Suficiente para llenar los gráficos de 40 puntos x 8 sensores
+    });
+    
+    return NextResponse.json(mediciones);
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 }

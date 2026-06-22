@@ -1,18 +1,33 @@
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/persistence/lib/prisma';
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
+  const dni = Number(body.dni);
 
-  // MOCK LOGIN: El backend de Java ya no existe y nuestra nueva DB usa Email en vez de DNI.
-  // Para que puedas testear el frontend, aceptamos cualquier DNI/Password y mockeamos la respuesta.
-  
+  // MOCK LOGIN INTELIGENTE:
+  // DNI 1 = ADMIN
+  // DNI 2 = OPERADOR_PLANTA
+  // DNI 3 = OPERADOR_BUQUE
+  let rolBuscado: any = 'ADMIN';
+  if (dni === 2) rolBuscado = 'OPERADOR_PLANTA';
+  if (dni === 3) rolBuscado = 'OPERADOR_BUQUE';
+
+  const usuarioDb = await prisma.usuario.findFirst({
+    where: { rol: rolBuscado }
+  });
+
+  if (!usuarioDb) {
+    return NextResponse.json({ error: { message: 'Usuario no encontrado en la DB.' } }, { status: 404 });
+  }
+
   const data = {
     token: 'jwt-falso-para-testear-nextjs',
     usuario: {
-      dni: Number(body.dni) || 12345678,
-      nombre: 'Usuario de Prueba',
-      rol: 'ADMIN',
+      dni: usuarioDb.id, // Pasamos su ID real de la base de datos como si fuera su DNI
+      nombre: usuarioDb.nombre,
+      rol: usuarioDb.rol,
       plantaId: null,
       buqueNroIMO: null,
       operacionId: null,

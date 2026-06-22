@@ -1,22 +1,25 @@
-import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/persistence/lib/prisma";
+import type { RolUsuario } from "@prisma/client";
 
 export async function POST(req: NextRequest) {
-  const token = (await cookies()).get("auth_token")?.value;
-  const body = await req.json();
+  try {
+    const body = await req.json();
 
-  const API_URL = process.env.API_URL ?? "http://localhost:8080";
+    if (!body.nombre || !body.email || !body.rol) {
+      return NextResponse.json({ error: "Faltan campos requeridos" }, { status: 400 });
+    }
 
-  const res = await fetch(`${API_URL}/v1/usuarios`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: JSON.stringify(body),
-    cache: "no-store",
-  });
+    const usuario = await prisma.usuario.create({
+      data: {
+        nombre: body.nombre,
+        email: body.email,
+        rol: body.rol as RolUsuario,
+      },
+    });
 
-  const data = await res.json().catch(() => ({}));
-  return NextResponse.json(data, { status: res.status });
+    return NextResponse.json(usuario, { status: 201 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 }

@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-
-const API_URL = process.env.API_URL ?? 'http://localhost:8080';
+import { prisma } from '@/persistence/lib/prisma';
 
 export async function GET(req: NextRequest) {
-  const token = (await cookies()).get('auth_token')?.value ?? '';
-  const r = await fetch(`${API_URL}/v1/sensores${req.nextUrl.search}`, {
-    headers: { Authorization: `Bearer ${token}` },
-    cache: 'no-store',
-  });
-  return NextResponse.json(await r.json(), { status: r.status });
+  try {
+    const sensores = await prisma.sensor.findMany();
+    return NextResponse.json(sensores);
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 }

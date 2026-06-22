@@ -21,7 +21,7 @@ export default async function PlantaPage() {
   ]);
 
   const operacionActiva =
-    enCurso && ['ACTIVA', 'PAUSADA'].includes(enCurso.estado) ? enCurso : null;
+    enCurso && ['ENCURSO', 'DETENIDA'].includes(enCurso.estado) ? enCurso : null;
 
   // Filtra por tu planta. Login todavía no manda plantaId real para usuarios sin historial
   // (gap conocido) → si viene null mostramos todas para no dejarte bloqueada/o.

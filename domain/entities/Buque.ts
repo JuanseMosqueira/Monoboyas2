@@ -43,10 +43,10 @@ export class Buque {
    * Recolecta dato del sensor de presión y lo publica al broker.
    * Invocado por el scheduler junto con monoboya.recolectarYTransmitirDatos().
    */
-  recolectarYTransmitirDatos(): void {
+  async recolectarYTransmitirDatos(): Promise<void> {
     if (!this.transmisorPresion || !this.publisher || !this.operacion) return;
 
-    this.transmisorPresion.actualizarDato();
+    await this.transmisorPresion.actualizarDato();
 
     const medicion = new Medicion(
       this.transmisorPresion.id,

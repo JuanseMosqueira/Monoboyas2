@@ -37,11 +37,11 @@ export abstract class Sensor {
    * Solicita un nuevo dato al proveedor y actualiza el estado interno.
    * No genera un objeto Medicion — eso lo hace quien recolecta (Monoboya/Buque).
    */
-  actualizarDato(): void {
+  async actualizarDato(): Promise<void> {
     if (!this.activo || !this.dataProvider) return;
 
     try {
-      this.valor = this.dataProvider.obtenerDato();
+      this.valor = await this.dataProvider.obtenerDato();
       this.ultimaMedicion = new Date();
     } catch (error) {
       console.error(

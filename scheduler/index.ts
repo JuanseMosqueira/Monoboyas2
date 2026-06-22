@@ -67,14 +67,22 @@ async function tick() {
 
       // 5. Emitir telemetría de esta iteración (cada iteración = 1 "tick" de simulación)
       // Esto publicará al broker -> CentralDatosSubscriber -> CentralDatos.procesarTelemetria
-      if (operacion.getMonoboya()) operacion.getMonoboya()!.recolectarYTransmitirDatos();
-      operacion.getBuque().recolectarYTransmitirDatos();
+      if (operacion.getMonoboya()) await operacion.getMonoboya()!.recolectarYTransmitirDatos();
+      await operacion.getBuque().recolectarYTransmitirDatos();
 
       // 6. Simular descuento de capacidad (Regla de negocio asignada a Operacion)
       // Descontamos un valor de caudal fijo para simular el paso de 1 segundo
       // (En la realidad esto se ataría al valor del sensor CAUDAL)
       operacion.descontarCapacidadBuque(1600); // 1600 litros / s 
     }
+    
+    // Imprimir un puntito en la consola para saber que está vivo
+    if (activasInfo.length > 0) {
+      process.stdout.write('🟢 ');
+    } else {
+      process.stdout.write('⚪ ');
+    }
+    
   } catch (error) {
     console.error("[Scheduler] Error en el ciclo de telemetría:", error);
   }

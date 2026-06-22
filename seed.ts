@@ -72,15 +72,24 @@ async function main() {
   // 5. Sensores
   console.log('📡 Configurando Sensores...');
   const sensores = [];
-  const tiposSensores: TipoSensor[] = ['TENSION', 'PRESION', 'OLEAJE', 'ORIENTACION', 'CORRIENTE', 'VIENTO'];
+  const tiposSensores: TipoSensor[] = ['TENSION', 'PRESION', 'OLEAJE', 'ORIENTACION', 'CORRIENTE', 'VIENTO', 'CAUDAL', 'AMARRE'];
 
   // Sensores para monoboyas
   for (const m of monoboyas) {
     for (const tipo of tiposSensores) {
+      let unidad = '';
+      if (tipo === 'TENSION' || tipo === 'AMARRE') unidad = 't';
+      else if (tipo === 'PRESION') unidad = 'bar';
+      else if (tipo === 'VIENTO') unidad = 'km/h';
+      else if (tipo === 'CAUDAL') unidad = 'm3/h';
+      else if (tipo === 'CORRIENTE') unidad = 'kn';
+      else if (tipo === 'OLEAJE') unidad = 'm';
+      else if (tipo === 'ORIENTACION') unidad = '°';
+
       sensores.push(await prisma.sensor.create({
         data: {
           tipo,
-          unidad: tipo === 'TENSION' ? 'kN' : tipo === 'PRESION' ? 'bar' : tipo === 'VIENTO' ? 'km/h' : 'm/s',
+          unidad,
           monoboyaId: m.id
         }
       }));

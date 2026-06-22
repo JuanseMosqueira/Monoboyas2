@@ -40,13 +40,17 @@ export class Monoboya {
    * Itera cada sensor, le pide actualizarDato(), crea un Medicion
    * y lo publica al broker. El scheduler invoca esto periódicamente.
    */
-  recolectarYTransmitirDatos(): void {
+  async recolectarYTransmitirDatos(): Promise<void> {
     if (!this.operacion || !this.publisher) return;
+
+    await Promise.all(
+      this.sensores
+        .filter((s): s is Sensor => s !== null)
+        .map((s) => s.actualizarDato())
+    );
 
     for (const sensor of this.sensores) {
       if (sensor === null) continue;
-
-      sensor.actualizarDato();
 
       const medicion = new Medicion(
         sensor.id,
