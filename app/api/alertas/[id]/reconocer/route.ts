@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { prisma } from "@/persistence/lib/prisma";
 
-export async function POST(
+export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -13,11 +14,16 @@ export async function POST(
   }
 
   try {
-    const body = await request.json();
-    const usuarioId = body.usuarioId; // Obligamos a mandar qué usuario reconoce
+    const jar = await cookies();
+    const userDataRaw = jar.get("user_data")?.value;
+    
+    let usuarioId: number | undefined;
+    if (userDataRaw) {
+      try { usuarioId = JSON.parse(userDataRaw).id; } catch {}
+    }
 
     if (!usuarioId) {
-       return NextResponse.json({ error: "Falta usuarioId en el body. El reconocimiento es por usuario." }, { status: 400 });
+       return NextResponse.json({ error: "Falta usuarioId en las cookies. El reconocimiento es por usuario." }, { status: 401 });
     }
 
     // Buscamos si la alerta le pertenece

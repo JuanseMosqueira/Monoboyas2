@@ -188,7 +188,11 @@ export default function AlertasPage() {
 
                     {/* Columna Fecha Generación */}
                     <td className="p-4 whitespace-nowrap text-xs text-[var(--color-text-muted)]">
-                      {new Date(alerta.generadaEn).toLocaleString('es-AR')}
+                      {new Date(alerta.generadaEn).toLocaleString('es-AR', { 
+                        year: 'numeric', month: '2-digit', day: '2-digit',
+                        hour: '2-digit', minute: '2-digit', second: '2-digit',
+                        hour12: false 
+                      })}
                     </td>
 
                     {/* Columna Estado y Auditoría */}
@@ -202,10 +206,9 @@ export default function AlertasPage() {
                           <span className="text-[var(--color-alerta-verde)] font-medium text-xs block">
                             ✓ {alerta.estado}
                           </span>
-                          {alerta.reconocidaPorDni && (
+                          {alerta.reconocidaEn && (
                             <span className="text-[var(--color-text-faint)] text-xs block mt-0.5">
-                              Por: DNI {alerta.reconocidaPorDni} <br />
-                              A las: {new Date(alerta.reconocidaEn!).toLocaleTimeString('es-AR')}
+                              A las: {new Date(alerta.reconocidaEn).toLocaleTimeString('es-AR', { hour12: false })}
                             </span>
                           )}
                         </div>
@@ -222,8 +225,8 @@ export default function AlertasPage() {
                           Reconocer alerta
                         </button>
                       ) : (
-                        <span className="text-xs text-[var(--color-text-faint)] italic">
-                          Registrada
+                        <span className="text-xs text-[var(--color-alerta-verde)] font-bold italic">
+                          Reconocida ✓
                         </span>
                       )}
                     </td>

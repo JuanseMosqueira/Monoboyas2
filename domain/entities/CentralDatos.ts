@@ -39,32 +39,33 @@ export class CentralDatos {
 
   private operacionesActivas: Map<number, Operacion> = new Map();
 
-  // ─── Umbrales (constantes de negocio) ─────────────────────────────
+  // ─── Umbrales (Ajustados para generar alertas constantes con los archivos de texto) ───
 
-  private static readonly AMARRE_AMARILLA = 700;
-  private static readonly AMARRE_ROJA     = 900;
+  private static readonly AMARRE_AMARILLA = 80;
+  private static readonly AMARRE_ROJA     = 88;
 
-  private static readonly TENSION_AMARILLA = 8.0;
-  private static readonly TENSION_ROJA     = 12.0;
+  private static readonly TENSION_AMARILLA = 7.5;
+  private static readonly TENSION_ROJA     = 8.0;
 
-  private static readonly PRESION_AMARILLA_ALTA    = 1_400_000;
-  private static readonly PRESION_ROJA_ALTA        = 1_600_000;
-  private static readonly PRESION_ROJA_BAJA        = 50_000;
+  private static readonly PRESION_AMARILLA_ALTA    = 1_380_000;
+  private static readonly PRESION_ROJA_ALTA        = 1_400_000;
+  private static readonly PRESION_ROJA_BAJA        = 1_300_000;
   private static readonly PRESION_ROJA_DISCREPANCIA = 200_000;
 
-  private static readonly CAUDAL_AMARILLA = 1600;
+  private static readonly CAUDAL_AMARILLA = 1550;
+  private static readonly CAUDAL_ROJA     = 1590; // Agregado para soportar roja en caudal
 
-  private static readonly OLEAJE_AMARILLA = 2.5;
-  private static readonly OLEAJE_ROJA     = 3.5;
+  private static readonly OLEAJE_AMARILLA = 1.5;
+  private static readonly OLEAJE_ROJA     = 2.5;
 
-  private static readonly ORIENTACION_AMARILLA = 15;
-  private static readonly ORIENTACION_ROJA     = 25;
+  private static readonly ORIENTACION_AMARILLA = 13.5;
+  private static readonly ORIENTACION_ROJA     = 14.8;
 
-  private static readonly CORRIENTE_AMARILLA = 1.5;
-  private static readonly CORRIENTE_ROJA     = 2.2;
+  private static readonly CORRIENTE_AMARILLA = 0.8;
+  private static readonly CORRIENTE_ROJA     = 1.2;
 
-  private static readonly VIENTO_AMARILLA = 55;
-  private static readonly VIENTO_ROJA     = 75;
+  private static readonly VIENTO_AMARILLA = 20;
+  private static readonly VIENTO_ROJA     = 35;
 
   constructor(
     medicionRepo: IMedicionRepository,
@@ -117,7 +118,7 @@ export class CentralDatos {
       );
 
       const usuarioId = this.resolverUsuarioPorRol(rol, opInfo);
-      if (usuarioId !== null) {
+      if (usuarioId) {
         await this.usuarioAlertaRepo.registrarRecepcion(alertaId, usuarioId);
       }
 
@@ -282,9 +283,14 @@ export class CentralDatos {
     return new Map();
   }
 
-  // ── Caudal ────────────────────────────────────────────────────────
-
   private verificarUmbralCaudal(valor: number, opId: number): Map<string, Alerta> {
+    if (valor >= CentralDatos.CAUDAL_ROJA) {
+      return this.crearAlertasTresRoles(
+        TipoAlerta.ROJA,
+        `[CRITICA] Caudal ${valor} l/s supera umbral rojo (${CentralDatos.CAUDAL_ROJA} l/s) — Op ${opId}`,
+        valor, "l/s",
+      );
+    }
     if (valor >= CentralDatos.CAUDAL_AMARILLA) {
       return this.crearAlertasTresRoles(
         TipoAlerta.AMARILLA,

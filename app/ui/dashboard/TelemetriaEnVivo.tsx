@@ -33,8 +33,8 @@ const SENSORES_INIT: Sensor[] = [
   { id: 'viento',    dbId: 8,  tipoSensor: 'VIENTO',    label: 'Velocidad de viento',      unidad: 'kn',   valor: 0, base: 18,   min: 0, max: 45,   amarillo: 22,   rojo: 32,   dec: 0 },
   { id: 'ola',       dbId: 9,  tipoSensor: 'OLEAJE',    label: 'Altura de ola',            unidad: 'm',    valor: 0, base: 1.4,  min: 0, max: 4,    amarillo: 1.8,  rojo: 2.6,  dec: 2 },
   { id: 'corriente', dbId: 10, tipoSensor: 'CORRIENTE', label: 'Velocidad de corriente',   unidad: 'kn',   valor: 0, base: 1.5,  min: 0, max: 5,    amarillo: 2.2,  rojo: 3.2,  dec: 1 },
-  { id: 'caudal',    dbId: 11, tipoSensor: 'CAUDAL',    label: 'Caudal de transferencia',  unidad: 'm3/h', valor: 0, base: 1080, min: 0, max: 1600, amarillo: 1400, rojo: 1500, dec: 0 },
-  { id: 'amarre',    dbId: 12, tipoSensor: 'AMARRE',    label: 'Tensión de amarre',        unidad: 't',    valor: 0, base: 46,   min: 0, max: 90,   amarillo: 62,   rojo: 75,   dec: 0 },
+  { id: 'caudal',    dbId: 11, tipoSensor: 'CAUDAL',    label: 'Caudal de transferencia',  unidad: 'm3/h', valor: 0, base: 1080, min: 0, max: 1700, amarillo: 1550, rojo: 1590, dec: 0 },
+  { id: 'amarre',    dbId: 12, tipoSensor: 'AMARRE',    label: 'Tensión de amarre',        unidad: 't',    valor: 0, base: 46,   min: 0, max: 100,  amarillo: 80,   rojo: 88,   dec: 0 },
 ];
 
 const HIST_LEN = 40;
@@ -229,7 +229,10 @@ export default function TelemetriaEnVivo({ operacionId }: { operacionId: number 
         const porSensor: Record<string, any[]> = {};
         mediciones.forEach((m) => { 
           if (m.tipo) {
-            (porSensor[m.tipo] ??= []).push(m); 
+            let val = m.valor;
+            if (m.tipo === 'PRESION') val = val / 100000; // Convertimos Pa a bar para el dashboard
+            if (m.tipo === 'VIENTO') val = val / 1.852; // km/h a nudos (kn) si fuera necesario, pero open-meteo suele dar km/h, wait
+            (porSensor[m.tipo] ??= []).push({ ...m, valor: val }); 
           }
         });
         Object.values(porSensor).forEach((arr) =>
