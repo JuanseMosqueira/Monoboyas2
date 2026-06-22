@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* ────────────────────────────────────────── */
+  /* FONDOS                                    */
+  /* ────────────────────────────────────────── */
+  --color-bg: #fff1f7;
+  --color-surface: #ffffff;
+  --color-surface-hover: #ffe6f1;
+  --color-border: #f9a8d4;
+
+  /* ────────────────────────────────────────── */
+  /* TEXTOS                                    */
+  /* ────────────────────────────────────────── */
+  --color-text: #4a044e;
+  --color-text-secondary: #701a75;
+  --color-text-muted: #9d174d;
+  --color-text-faint: #be185d;
+
+  /* ────────────────────────────────────────── */
+  /* MARCA                                     */
+  /* ────────────────────────────────────────── */
+  --color-primary: #ec4899;
+  --color-primary-soft: #f472b6;
+
+  --color-secondary: #ff69b4;
+  --color-secondary-soft: #fbcfe8;
+
+  /* ────────────────────────────────────────── */
+  /* ALERTAS                                   */
+  /* ────────────────────────────────────────── */
+  --color-alerta-verde: #22c55e;
+  --color-alerta-amarillo: #f59e0b;
+  --color-alerta-rojo: #dc2626;
+
+  /* ────────────────────────────────────────── */
+  /* WARNING                                   */
+  /* ────────────────────────────────────────── */
+  --color-warning-bg: #ffe4e6;
+  --color-warning-border: #fb7185;
+  --color-warning-text: #be123c;
+
+  /* ────────────────────────────────────────── */
+  /* SOMBRAS                                   */
+  /* ────────────────────────────────────────── */
+  --shadow-primary: rgba(236, 72, 153, 0.25);
+  --shadow-danger: rgba(220, 38, 38, 0.25);
+
+  --color-danger-soft: rgba(127, 29, 29, 0.2);  /* hover de acciones destructivas (era red-900/20) */
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  color: var(--color-text);
+
+  background:
+    radial-gradient(
+      circle at 0% 0%,
+      rgba(236, 72, 153, 0.30),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(244, 114, 182, 0.25),
+      transparent 25%
+    ),
+    radial-gradient(
+      circle at 100% 100%,
+      rgba(255, 105, 180, 0.25),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 0% 100%,
+      rgba(251, 113, 133, 0.20),
+      transparent 25%
+    ),
+    linear-gradient(
+      135deg,
+      #ffffff,
+      #fff0f6,
+      #ffe4ee,
+      #fff5f8
+    );
+
+  background-attachment: fixed;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+
+  background-image:
+    radial-gradient(circle, rgba(236,72,153,0.08) 2px, transparent 2px);
+
+  background-size: 40px 40px;
+}
