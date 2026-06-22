@@ -274,7 +274,7 @@ export default function TelemetriaEnVivo({ operacionId }: { operacionId: number 
     };
 
     cargar();
-    const t = setInterval(cargar, 3000);
+    const t = setInterval(cargar, 1000);
     return () => clearInterval(t);
   }, [operacionId]);
 

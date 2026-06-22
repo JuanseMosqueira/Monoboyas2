@@ -15,14 +15,14 @@ export type UmbralesConfig = {
 const ARCHIVO = path.join(process.cwd(), '.umbrales.json');
 
 const DEFAULTS: UmbralesConfig = {
-  AMARRE:      { amarilla: 600.0,      roja: 900.0 },
-  TENSION:     { amarilla: 8.0,        roja: 12.0 },
-  PRESION:     { amarillaAlta: 1_400_000.0, rojaAlta: 1_600_000.0, rojaBaja: 50_000.0, rojaDiscrepancia: 200_000.0 },
-  CAUDAL:      { amarilla: 1600.0 },
-  OLEAJE:      { amarilla: 2.5,        roja: 3.5 },
-  ORIENTACION: { amarilla: 15.0,       roja: 25.0 },
-  CORRIENTE:   { amarilla: 1.5,        roja: 2.2 },
-  VIENTO:      { amarilla: 55.0,       roja: 75.0 },
+  AMARRE:      { amarilla: 80.0,      roja: 88.0 },
+  TENSION:     { amarilla: 7.5,        roja: 8.0 },
+  PRESION:     { amarillaAlta: 1_380_000.0, rojaAlta: 1_400_000.0, rojaBaja: 1_300_000.0, rojaDiscrepancia: 200_000.0 },
+  CAUDAL:      { amarilla: 1550.0 }, // La "roja" del Caudal la definimos directo en el sensor init
+  OLEAJE:      { amarilla: 1.5,        roja: 2.5 },
+  ORIENTACION: { amarilla: 13.5,       roja: 14.8 },
+  CORRIENTE:   { amarilla: 0.8,        roja: 1.2 },
+  VIENTO:      { amarilla: 20.0,       roja: 35.0 },
 };
 
 export function getUmbrales(): UmbralesConfig {
