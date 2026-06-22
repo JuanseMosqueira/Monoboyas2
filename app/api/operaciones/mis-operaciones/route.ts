@@ -32,11 +32,16 @@ export async function GET(request: Request) {
           in: ['PLANIFICADA', 'ENCURSO', 'DETENIDA']
         }
       },
-      orderBy: { id: 'desc' },
-      take: 1
+      orderBy: { id: 'desc' }
     });
 
-    return NextResponse.json(operaciones);
+    // Priorizamos las operaciones activas para que el dashboard no quede bloqueado mostrando una planificada
+    const activa = operaciones.find(o => o.estado === 'ENCURSO' || o.estado === 'DETENIDA');
+    const planificada = operaciones.find(o => o.estado === 'PLANIFICADA');
+
+    const resultado = activa ? [activa] : planificada ? [planificada] : [];
+
+    return NextResponse.json(resultado);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

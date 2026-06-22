@@ -3,20 +3,7 @@ import { PrismaClient, TipoSensor, OrigenMedicion, TipoAlerta, EstadoOperacion }
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🧹 Limpiando base de datos (esto puede tardar unos segundos)...');
-
-  // El orden es importante por las Foreign Keys
-  await prisma.usuarioAlerta.deleteMany();
-  await prisma.alerta.deleteMany();
-  await prisma.medicion.deleteMany();
-  await prisma.operacion.deleteMany();
-  await prisma.sensor.deleteMany();
-  await prisma.monoboya.deleteMany();
-  await prisma.buque.deleteMany();
-  await prisma.planta.deleteMany();
-  await prisma.usuario.deleteMany();
-
-  console.log('🌱 Sembrando datos ficticios masivos...');
+  console.log('Sembrando datos ficticios masivos...');
 
   // 1. Plantas
   const plantaNorte = await prisma.planta.create({
@@ -49,28 +36,30 @@ async function main() {
     }));
   }
 
-  // 4. Usuarios (Operadores y Admin)
-  const admin = await prisma.usuario.create({
-    data: { nombre: 'Laura (Admin)', email: 'admin@spm.com', rol: 'ADMIN', dni: 11111111, contrasena: '1234' }
+  // 4. Usuarios (Operadores y Admin) - Exactamente 4 usuarios
+  const admin = await prisma.usuario.upsert({
+    where: { email: 'admin@spm.com' },
+    update: {},
+    create: { nombre: 'Laura (Admin)', email: 'admin@spm.com', rol: 'ADMIN', dni: 11111111, contrasena: '1234' }
   });
-  const opPlanta1 = await prisma.usuario.create({
-    data: { nombre: 'María (Planta Norte)', email: 'planta1@spm.com', rol: 'OPERADOR_PLANTA', dni: 22222222, contrasena: '1234', plantaId: plantaNorte.id }
+  const opPlanta = await prisma.usuario.upsert({
+    where: { email: 'planta@spm.com' },
+    update: {},
+    create: { nombre: 'María (Planta)', email: 'planta@spm.com', rol: 'OPERADOR_PLANTA', dni: 22222222, contrasena: '1234', plantaId: plantaNorte.id }
   });
-  const opPlanta2 = await prisma.usuario.create({
-    data: { nombre: 'Jorge (Planta Sur)', email: 'planta2@spm.com', rol: 'OPERADOR_PLANTA', dni: 33333333, contrasena: '1234', plantaId: plantaSur.id }
+  const opBuque = await prisma.usuario.upsert({
+    where: { email: 'buque@spm.com' },
+    update: {},
+    create: { nombre: 'Capitán Roberts', email: 'buque@spm.com', rol: 'OPERADOR_BUQUE', dni: 33333333, contrasena: '1234', buqueNroIMO: buques[0].nroIMO }
   });
-  const opBuque1 = await prisma.usuario.create({
-    data: { nombre: 'Capitán Roberts', email: 'buque1@spm.com', rol: 'OPERADOR_BUQUE', dni: 44444444, contrasena: '1234', buqueNroIMO: buques[0].nroIMO }
-  });
-  const opBuque2 = await prisma.usuario.create({
-    data: { nombre: 'Capitán Lee', email: 'buque2@spm.com', rol: 'OPERADOR_BUQUE', dni: 55555555, contrasena: '1234', buqueNroIMO: buques[1].nroIMO }
-  });
-  const opLancha1 = await prisma.usuario.create({
-    data: { nombre: 'Carlos (Lancha)', email: 'lancha1@spm.com', rol: 'OPERADOR_LANCHA', dni: 66666666, contrasena: '1234' }
+  const opLancha = await prisma.usuario.upsert({
+    where: { email: 'lancha@spm.com' },
+    update: {},
+    create: { nombre: 'Carlos (Lancha)', email: 'lancha@spm.com', rol: 'OPERADOR_LANCHA', dni: 44444444, contrasena: '1234' }
   });
 
   // 5. Sensores
-  console.log('📡 Configurando Sensores...');
+  console.log('Configurando Sensores...');
   const sensores: any[] = [];
   const tiposSensores: TipoSensor[] = ['TENSION', 'PRESION', 'OLEAJE', 'ORIENTACION', 'CORRIENTE', 'VIENTO', 'CAUDAL', 'AMARRE'];
 
@@ -97,7 +86,7 @@ async function main() {
   }
 
   // 6. Operaciones
-  console.log('⚙️ Creando historial de operaciones...');
+  console.log('Creando historial de operaciones...');
   const operaciones: any[] = [];
 
   // Operación 1: EN CURSO (Muy activa, alertas recientes)
@@ -108,9 +97,9 @@ async function main() {
       buqueNroIMO: buques[0].nroIMO,
       plantaId: plantaNorte.id,
       monoboyaId: monoboyas[0].id,
-      operadorBuqueId: opBuque1.id,
-      operadorPlantaId: opPlanta1.id,
-      operadorLanchaId: opLancha1.id,
+      operadorBuqueId: opBuque.id,
+      operadorPlantaId: opPlanta.id,
+      operadorLanchaId: opLancha.id,
     }
   }));
 
@@ -122,8 +111,8 @@ async function main() {
       buqueNroIMO: buques[1].nroIMO,
       plantaId: plantaSur.id,
       monoboyaId: monoboyas[1].id,
-      operadorBuqueId: opBuque2.id,
-      operadorPlantaId: opPlanta2.id,
+      operadorBuqueId: opBuque.id,
+      operadorPlantaId: opPlanta.id,
     }
   }));
 
@@ -150,7 +139,7 @@ async function main() {
   }));
 
   // 7. Mediciones y Alertas para la Operación EN CURSO
-  console.log('📈 Simulando miles de mediciones...');
+  console.log('Simulando miles de mediciones...');
   const opActiva = operaciones[0];
   const sensoresActivos = sensores.filter(s => s.monoboyaId === opActiva.monoboyaId);
 
@@ -190,7 +179,7 @@ async function main() {
 
   // 8. Crear alertas asociadas
   if (medicionPeligrosa) {
-    console.log('🚨 Generando Alertas Críticas...');
+    console.log('Generando Alertas Críticas...');
     const alerta = await prisma.alerta.create({
       data: {
         tipoAlerta: 'ROJA',
@@ -206,13 +195,13 @@ async function main() {
     // Asignar la alerta a los operadores
     await prisma.usuarioAlerta.createMany({
       data: [
-        { alertaId: alerta.id, usuarioId: opPlanta1.id, reconocida: false },
-        { alertaId: alerta.id, usuarioId: opBuque1.id, reconocida: true, reconocidaEn: new Date() }
+        { alertaId: alerta.id, usuarioId: opPlanta.id, reconocida: false },
+        { alertaId: alerta.id, usuarioId: opBuque.id, reconocida: true, reconocidaEn: new Date() }
       ]
     });
   }
 
-  console.log('✅ ¡Base de datos poblada masivamente! Ya puedes revisar tu Dashboard.');
+  console.log('Base de datos poblada masivamente! Ya puedes revisar tu Dashboard.');
 }
 
 main()

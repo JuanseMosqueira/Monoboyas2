@@ -93,7 +93,20 @@ export default function BuqueDashboard({
         )}
       </div>
 
-      <TelemetriaEnVivo operacionId={operacionId} />
+      {activa ? (
+        <TelemetriaEnVivo operacionId={operacionId} />
+      ) : (
+        <div className="px-8 mt-8 max-w-7xl w-full">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-10 text-center flex flex-col items-center justify-center">
+            <PauseIcon className="w-12 h-12 text-[var(--color-alerta-amarillo)] mb-4 opacity-50" />
+            <h2 className="text-xl font-bold text-[var(--color-text)] mb-2">Operación detenida</h2>
+            <p className="text-[var(--color-text-muted)] max-w-md">
+              La telemetría en vivo y los controles de alerta no se muestran mientras la operación está pausada.
+              Reanudá la operación para volver a ver los datos en tiempo real.
+            </p>
+          </div>
+        </div>
+      )}
     </>
   );
 }

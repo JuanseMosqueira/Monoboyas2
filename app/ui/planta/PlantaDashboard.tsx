@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import TelemetriaEnVivo from '@/app/ui/dashboard/TelemetriaEnVivo';
 
-type Estado = 'ACTIVA' | 'PAUSADA';
+    type Estado = 'ENCURSO' | 'DETENIDA';
 
 export default function PlantaDashboard({
   operacionId, estadoInicial, nombre,
@@ -50,6 +50,8 @@ export default function PlantaDashboard({
     );
   }
 
+  const activa = estadoInicial === 'ENCURSO';
+
   return (
     <>
       <div className="px-8 pt-8 max-w-7xl w-full">
@@ -62,7 +64,7 @@ export default function PlantaDashboard({
           {!confirmando ? (
             <button
               onClick={() => setConfirmando(true)}
-              disabled={cargando}
+              disabled={cargando || !activa}
               className="flex items-center gap-2 px-5 py-3 rounded-lg font-bold text-sm text-white transition-all disabled:opacity-40 hover:brightness-110"
               style={{ backgroundColor: 'var(--color-alerta-verde)' }}
             >
@@ -100,7 +102,18 @@ export default function PlantaDashboard({
         )}
       </div>
 
-      <TelemetriaEnVivo operacionId={operacionId} />
+      {activa ? (
+        <TelemetriaEnVivo operacionId={operacionId} />
+      ) : (
+        <div className="px-8 mt-8 max-w-7xl w-full">
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-10 text-center flex flex-col items-center justify-center">
+            <h2 className="text-xl font-bold text-[var(--color-text)] mb-2">Operación detenida</h2>
+            <p className="text-[var(--color-text-muted)] max-w-md">
+              La telemetría no se muestra porque la operación fue detenida por el buque.
+            </p>
+          </div>
+        </div>
+      )}
     </>
   );
 }
