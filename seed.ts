@@ -18,27 +18,7 @@ async function main() {
 
   console.log('🌱 Sembrando datos ficticios masivos...');
 
-  // 1. Usuarios (Operadores y Admin)
-  const admin = await prisma.usuario.create({
-    data: { nombre: 'Laura (Admin)', email: 'admin@spm.com', rol: 'ADMIN' }
-  });
-  const opPlanta1 = await prisma.usuario.create({
-    data: { nombre: 'María (Planta Norte)', email: 'planta1@spm.com', rol: 'OPERADOR_PLANTA' }
-  });
-  const opPlanta2 = await prisma.usuario.create({
-    data: { nombre: 'Jorge (Planta Sur)', email: 'planta2@spm.com', rol: 'OPERADOR_PLANTA' }
-  });
-  const opBuque1 = await prisma.usuario.create({
-    data: { nombre: 'Capitán Roberts', email: 'buque1@spm.com', rol: 'OPERADOR_BUQUE' }
-  });
-  const opBuque2 = await prisma.usuario.create({
-    data: { nombre: 'Capitán Lee', email: 'buque2@spm.com', rol: 'OPERADOR_BUQUE' }
-  });
-  const opLancha1 = await prisma.usuario.create({
-    data: { nombre: 'Carlos (Lancha)', email: 'lancha1@spm.com', rol: 'OPERADOR_LANCHA' }
-  });
-
-  // 2. Plantas
+  // 1. Plantas
   const plantaNorte = await prisma.planta.create({
     data: { nombre: 'Planta Terminal Norte', ubicacion: 'Bahía Blanca' }
   });
@@ -46,8 +26,8 @@ async function main() {
     data: { nombre: 'Refinería Sur', ubicacion: 'Comodoro Rivadavia' }
   });
 
-  // 3. Monoboyas
-  const monoboyas = [];
+  // 2. Monoboyas
+  const monoboyas: any[] = [];
   for (let i = 1; i <= 5; i++) {
     const estado = i === 5 ? 'DESHABILITADA' : (i === 1 ? 'OCUPADA' : 'DISPONIBLE');
     monoboyas.push(await prisma.monoboya.create({
@@ -55,8 +35,8 @@ async function main() {
     }));
   }
 
-  // 4. Buques
-  const buques = [];
+  // 3. Buques
+  const buques: any[] = [];
   const nombresBuques = ['Oceanic Explorer', 'Atlantic Voyager', 'Pacific Titan', 'Gulf Navigator', 'Nordic Spirit'];
   for (let i = 0; i < 5; i++) {
     buques.push(await prisma.buque.create({
@@ -69,9 +49,29 @@ async function main() {
     }));
   }
 
+  // 4. Usuarios (Operadores y Admin)
+  const admin = await prisma.usuario.create({
+    data: { nombre: 'Laura (Admin)', email: 'admin@spm.com', rol: 'ADMIN', dni: 11111111, contrasena: '1234' }
+  });
+  const opPlanta1 = await prisma.usuario.create({
+    data: { nombre: 'María (Planta Norte)', email: 'planta1@spm.com', rol: 'OPERADOR_PLANTA', dni: 22222222, contrasena: '1234', plantaId: plantaNorte.id }
+  });
+  const opPlanta2 = await prisma.usuario.create({
+    data: { nombre: 'Jorge (Planta Sur)', email: 'planta2@spm.com', rol: 'OPERADOR_PLANTA', dni: 33333333, contrasena: '1234', plantaId: plantaSur.id }
+  });
+  const opBuque1 = await prisma.usuario.create({
+    data: { nombre: 'Capitán Roberts', email: 'buque1@spm.com', rol: 'OPERADOR_BUQUE', dni: 44444444, contrasena: '1234', buqueNroIMO: buques[0].nroIMO }
+  });
+  const opBuque2 = await prisma.usuario.create({
+    data: { nombre: 'Capitán Lee', email: 'buque2@spm.com', rol: 'OPERADOR_BUQUE', dni: 55555555, contrasena: '1234', buqueNroIMO: buques[1].nroIMO }
+  });
+  const opLancha1 = await prisma.usuario.create({
+    data: { nombre: 'Carlos (Lancha)', email: 'lancha1@spm.com', rol: 'OPERADOR_LANCHA', dni: 66666666, contrasena: '1234' }
+  });
+
   // 5. Sensores
   console.log('📡 Configurando Sensores...');
-  const sensores = [];
+  const sensores: any[] = [];
   const tiposSensores: TipoSensor[] = ['TENSION', 'PRESION', 'OLEAJE', 'ORIENTACION', 'CORRIENTE', 'VIENTO', 'CAUDAL', 'AMARRE'];
 
   // Sensores para monoboyas
@@ -98,7 +98,7 @@ async function main() {
 
   // 6. Operaciones
   console.log('⚙️ Creando historial de operaciones...');
-  const operaciones = [];
+  const operaciones: any[] = [];
 
   // Operación 1: EN CURSO (Muy activa, alertas recientes)
   operaciones.push(await prisma.operacion.create({

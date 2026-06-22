@@ -18,7 +18,7 @@ export class MockDataProvider implements ISensorDataProvider {
     }
   }
 
-  obtenerDato(): number {
+  async obtenerDato(): Promise<number> {
     return this.base + (Math.random() * this.oscilacion * 2 - this.oscilacion);
   }
 }

@@ -66,7 +66,13 @@ model Usuario {
   id              Int           @id @default(autoincrement())
   nombre          String
   email           String        @unique
+  dni             Int           @unique
+  contrasena      String
   rol             RolUsuario
+  plantaId        Int?
+  planta          Planta?       @relation("OperadoresPlanta", fields: [plantaId], references: [id])
+  buqueNroIMO     Int?
+  buque           Buque?        @relation("OperadoresBuque", fields: [buqueNroIMO], references: [nroIMO])
   usuarioAlertas  UsuarioAlerta[]
   operacionBuque  Operacion[]   @relation("OperadorBuque")
   operacionLancha Operacion[]   @relation("OperadorLancha")
@@ -77,6 +83,7 @@ model Planta {
   id         Int         @id @default(autoincrement())
   nombre     String
   ubicacion  String?
+  operadores Usuario[]   @relation("OperadoresPlanta")
   operaciones Operacion[]
   sensores   Sensor[]    @relation("SensoresPlanta")
 }
@@ -87,6 +94,7 @@ model Buque {
   nombre       String
   capacidadMax Float
   capacidadActual Float
+  operadores   Usuario[]   @relation("OperadoresBuque")
   operaciones  Operacion[]
   sensores     Sensor[]    @relation("SensoresBuque")
 }

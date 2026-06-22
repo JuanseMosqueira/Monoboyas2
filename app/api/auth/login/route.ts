@@ -3,50 +3,56 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/persistence/lib/prisma';
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const dni = Number(body.dni);
+  try {
+    const body = await req.json();
+    const dni = Number(body.dni);
+    const password = body.password?.toString() || '';
 
-  // MOCK LOGIN INTELIGENTE:
-  // DNI 1 = ADMIN
-  // DNI 2 = OPERADOR_PLANTA
-  // DNI 3 = OPERADOR_BUQUE
-  let rolBuscado: any = 'ADMIN';
-  if (dni === 2) rolBuscado = 'OPERADOR_PLANTA';
-  if (dni === 3) rolBuscado = 'OPERADOR_BUQUE';
-
-  const usuarioDb = await prisma.usuario.findFirst({
-    where: { rol: rolBuscado }
-  });
-
-  if (!usuarioDb) {
-    return NextResponse.json({ error: { message: 'Usuario no encontrado en la DB.' } }, { status: 404 });
-  }
-
-  const data = {
-    token: 'jwt-falso-para-testear-nextjs',
-    usuario: {
-      dni: usuarioDb.id, // Pasamos su ID real de la base de datos como si fuera su DNI
-      nombre: usuarioDb.nombre,
-      rol: usuarioDb.rol,
-      plantaId: null,
-      buqueNroIMO: null,
-      operacionId: null,
-      creadoEn: new Date().toISOString()
+    if (!dni || isNaN(dni)) {
+      return NextResponse.json({ error: { message: 'DNI inválido.' } }, { status: 400 });
     }
-  };
 
-  // Setear las cookies que el resto del front espera
-  const cookieStore = await cookies();
-  cookieStore.set('auth_token', data.token, {
-    httpOnly: false,
-    path: '/',
-    maxAge: 60 * 60 * 24, // 24h
-  });
-  cookieStore.set('user_data', JSON.stringify(data.usuario), {
-    httpOnly: false,
-    path: '/',
-    maxAge: 60 * 60 * 24,
-  });
+    const usuarioDb = await prisma.usuario.findUnique({
+      where: { dni }
+    });
 
-  return NextResponse.json(data);
+    if (!usuarioDb) {
+      return NextResponse.json({ error: { message: 'Usuario no encontrado.' } }, { status: 404 });
+    }
+
+    if (usuarioDb.contrasena !== password) {
+      return NextResponse.json({ error: { message: 'Contraseña incorrecta.' } }, { status: 401 });
+    }
+
+    const data = {
+      token: 'jwt-falso-para-testear-nextjs',
+      usuario: {
+        id: usuarioDb.id,
+        dni: usuarioDb.dni,
+        nombre: usuarioDb.nombre,
+        rol: usuarioDb.rol,
+        plantaId: usuarioDb.plantaId,
+        buqueNroIMO: usuarioDb.buqueNroIMO,
+        creadoEn: new Date().toISOString()
+      }
+    };
+
+    // Setear las cookies que el resto del front espera
+    const cookieStore = await cookies();
+    cookieStore.set('auth_token', data.token, {
+      httpOnly: false,
+      path: '/',
+      maxAge: 60 * 60 * 24, // 24h
+    });
+    cookieStore.set('user_data', JSON.stringify(data.usuario), {
+      httpOnly: false,
+      path: '/',
+      maxAge: 60 * 60 * 24,
+    });
+
+    return NextResponse.json(data);
+  } catch (error: any) {
+    console.error("Login API Error:", error);
+    return NextResponse.json({ error: { message: error.message || 'Error interno del servidor.' } }, { status: 500 });
+  }
 }

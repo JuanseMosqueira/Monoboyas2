@@ -10,13 +10,23 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Falta el DNI" }, { status: 400 });
     }
 
-    // Buscamos cualquier operación asignada a este usuario (que ahora sabemos que el DNI es su ID)
+    const usuario = await prisma.usuario.findUnique({
+      where: { dni }
+    });
+
+    if (!usuario) {
+      return NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 });
+    }
+
+    const userId = usuario.id;
+
+    // Buscamos cualquier operación asignada a este usuario usando su ID real
     const operaciones = await prisma.operacion.findMany({
       where: {
         OR: [
-          { operadorPlantaId: dni },
-          { operadorBuqueId: dni },
-          { operadorLanchaId: dni }
+          { operadorPlantaId: userId },
+          { operadorBuqueId: userId },
+          { operadorLanchaId: userId }
         ],
         estado: {
           in: ['PLANIFICADA', 'ENCURSO', 'DETENIDA']
